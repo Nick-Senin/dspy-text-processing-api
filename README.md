@@ -1,11 +1,10 @@
-# DSPy Boilerplate - Система Извлечения Преобразований
+# DSPy Text Processing API - Система Извлечения Преобразований
 
 Система для извлечения и обработки преобразований из текста с использованием DSPy.
 
 ## Структура проекта
 
 ```
-dspy-boilerplate/
 ├── modules/                    # Основные модули системы
 │   ├── extract.py             # Извлечение преобразований
 │   ├── process.py             # Обработка и фильтрация
@@ -26,6 +25,9 @@ dspy-boilerplate/
 ├── run_server.py              # Запуск Flask сервера
 ├── config.py                  # Конфигурация
 ├── requirements.txt           # Зависимости
+├── Dockerfile                 # Docker образ для развертывания
+├── docker-compose.yml         # Docker Compose конфигурация
+├── DEPLOYMENT.md              # Руководство по развертыванию
 └── demonstrations.json        # Примеры для обучения
 ```
 
@@ -60,22 +62,19 @@ python main.py --validate
 python run_server.py
 ```
 
-Или из папки сервера:
+Или напрямую:
 ```bash
-cd server
-python app.py
+python server/app.py
 ```
 
 Тестирование API:
 ```bash
-cd server
-python test_server.py
+python server/test_server.py
 ```
 
 Пример использования:
 ```bash
-cd server
-python example_request.py
+python server/example_request.py
 ```
 
 ### 3. API Эндпоинт
@@ -95,7 +94,6 @@ python example_request.py
 ```json
 {
     "success": true,
-    "filtered_triplets": [...],
     "unfiltered_triplets": [...],
     "failed_reasoning": "...",
     "processed_count": 2,
@@ -111,7 +109,7 @@ python example_request.py
 - Фильтрует по банальности
 - Обогащает прошедшие фильтр связки
 - Фильтрует по воспроизводимости
-- Возвращает отфильтрованные и неотфильтрованные связки
+- Возвращает неотфильтрованные связки и детали отфильтрованных
 
 ### Flask сервер
 Предоставляет REST API для обработки текста с настраиваемыми фильтрами.

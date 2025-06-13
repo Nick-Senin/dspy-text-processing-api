@@ -1,121 +1,94 @@
+#!/usr/bin/env python3
+"""
+Пример запроса к Flask серверу для обработки текста.
+"""
+
 import requests
 import json
 
-# Конфигурация
-SERVER_URL = "http://localhost:5000"  # Локальный сервер
-# SERVER_URL = "https://081d-138-68-156-65.ngrok-free.app"  # Ngrok URL
-
-def make_request(text, banal_threshold=0.6, reproducibility_threshold=0.7):
-    """Отправляет запрос на обработку текста."""
+def main():
+    # URL сервера
+    url = "http://localhost:5000/process"
     
+    # Пример текста для обработки
+    sample_text = """
+    Когда человек сталкивается с проблемой, он часто пытается решить её привычными способами. 
+    Однако иногда требуется изменить подход к решению проблемы. 
+    Применение нового метода может привести к неожиданному и эффективному результату.
+    """
+    
+    # Данные для отправки
     data = {
-        "text": text,
-        "banal_threshold": banal_threshold,
-        "reproducibility_threshold": reproducibility_threshold
+        "text": sample_text.strip(),
+        "banal_threshold": 0.6,
+        "reproducibility_threshold": 0.7
     }
     
+    print("🚀 Отправка запроса к Flask серверу...")
+    print(f"📝 Текст: {data['text'][:100]}...")
+    print(f"🎯 Порог банальности: {data['banal_threshold']}")
+    print(f"🔄 Порог воспроизводимости: {data['reproducibility_threshold']}")
+    
     try:
-        print(f"🚀 Отправка запроса на {SERVER_URL}/process")
-        print(f"📝 Текст: {text[:100]}{'...' if len(text) > 100 else ''}")
-        print(f"🎯 Пороги: банальность={banal_threshold}, воспроизводимость={reproducibility_threshold}")
-        print("\n" + "="*60)
-        
+        # Отправляем POST запрос
         response = requests.post(
-            f"{SERVER_URL}/process",
+            url,
             json=data,
             headers={'Content-Type': 'application/json'},
-            timeout=60
+            timeout=30
         )
         
-        print(f"📊 Статус ответа: {response.status_code}")
-        
+        # Проверяем статус ответа
         if response.status_code == 200:
             result = response.json()
             
-            if result.get('success'):
-                print("✅ Обработка завершена успешно!\n")
-                
-                # Основная статистика
-                filtered_count = result.get('processed_count', 0)
-                total_count = result.get('total_count', 0)
-                filter_rate = (total_count - filtered_count) / total_count * 100 if total_count > 0 else 0
-                
-                print(f"📈 СТАТИСТИКА:")
-                print(f"   Всего извлечено связок: {total_count}")
-                print(f"   Прошло фильтры: {filtered_count}")
-                print(f"   Отфильтровано: {total_count - filtered_count} ({filter_rate:.1f}%)")
-                
-                # Отфильтрованные связки
-                filtered_triplets = result.get('filtered_triplets', [])
-                if filtered_triplets:
-                    print(f"\n🎯 ОТФИЛЬТРОВАННЫЕ СВЯЗКИ ({len(filtered_triplets)}):")
-                    for i, triplet in enumerate(filtered_triplets, 1):
-                        print(f"\n   {i}. Исходное состояние: {triplet.get('initial_state', 'N/A')}")
-                        print(f"      Трансформация: {triplet.get('transformation', 'N/A')}")
-                        print(f"      Результат: {triplet.get('result', 'N/A')}")
-                else:
-                    print("\n🎯 ОТФИЛЬТРОВАННЫЕ СВЯЗКИ: Нет")
-                
-                # Все извлеченные связки
-                unfiltered_triplets = result.get('unfiltered_triplets', [])
-                if unfiltered_triplets:
-                    print(f"\n📋 ВСЕ ИЗВЛЕЧЕННЫЕ СВЯЗКИ ({len(unfiltered_triplets)}):")
-                    for i, triplet in enumerate(unfiltered_triplets, 1):
-                        print(f"\n   {i}. Исходное состояние: {triplet.get('initial_state', 'N/A')}")
-                        print(f"      Трансформация: {triplet.get('transformation', 'N/A')}")
-                        print(f"      Результат: {triplet.get('result', 'N/A')}")
-                
-                # Причины отфильтровки
-                failed_reasoning = result.get('failed_reasoning', '')
-                if failed_reasoning:
-                    print(f"\n❌ ПРИЧИНЫ ОТФИЛЬТРОВКИ:")
-                    print(f"   {failed_reasoning}")
-                else:
-                    print(f"\n❌ ПРИЧИНЫ ОТФИЛЬТРОВКИ: Нет отфильтрованных связок")
-                    
-            else:
-                print(f"❌ Ошибка обработки: {result.get('message')}")
-                
+            print("\n✅ Запрос выполнен успешно!")
+            print(f"📊 Всего извлечено связок: {result.get('total_count', 0)}")
+            print(f"✨ Прошло фильтры: {result.get('processed_count', 0)}")
+            
+            # Показываем отфильтрованные связки (прошедшие все фильтры)
+            filtered = result.get('filtered_triplets', [])
+            if filtered:
+                print(f"\n✅ Отфильтрованные связки (прошли все фильтры) ({len(filtered)}):")
+                for i, triplet in enumerate(filtered, 1):
+                    print(f"\n  {i}. Связка:")
+                    print(f"     Начальное состояние: {triplet.get('initial_state', 'N/A')}")
+                    print(f"     Преобразование: {triplet.get('transformation', 'N/A')}")
+                    print(f"     Результат: {triplet.get('result', 'N/A')}")
+            
+            # Показываем неотфильтрованные связки
+            unfiltered = result.get('unfiltered_triplets', [])
+            if unfiltered:
+                print(f"\n📋 Все извлеченные связки ({len(unfiltered)}):")
+                for i, triplet in enumerate(unfiltered, 1):
+                    print(f"\n  {i}. Связка:")
+                    print(f"     Начальное состояние: {triplet.get('initial_state', 'N/A')}")
+                    print(f"     Преобразование: {triplet.get('transformation', 'N/A')}")
+                    print(f"     Результат: {triplet.get('result', 'N/A')}")
+            
+            # Показываем рассуждения об отфильтрованных
+            failed_reasoning = result.get('failed_reasoning', '')
+            if failed_reasoning:
+                print(f"\n🚫 Рассуждения об отфильтрованных связках:")
+                print(failed_reasoning)
+            
         else:
-            print(f"❌ HTTP ошибка: {response.status_code}")
+            print(f"\n❌ Ошибка HTTP {response.status_code}")
             try:
                 error_data = response.json()
-                print(f"   Сообщение: {error_data.get('message', 'Неизвестная ошибка')}")
+                print(f"Сообщение: {error_data.get('message', 'Неизвестная ошибка')}")
             except:
-                print(f"   Текст ответа: {response.text}")
+                print(f"Ответ сервера: {response.text}")
                 
-    except requests.exceptions.Timeout:
-        print("⏰ Превышено время ожидания ответа")
     except requests.exceptions.ConnectionError:
-        print("🔌 Ошибка подключения к серверу")
+        print("\n❌ Не удалось подключиться к серверу.")
+        print("Убедитесь, что Flask сервер запущен: python app.py")
+        
+    except requests.exceptions.Timeout:
+        print("\n⏰ Превышено время ожидания ответа от сервера.")
+        
     except Exception as e:
-        print(f"💥 Неожиданная ошибка: {e}")
-
-def main():
-    """Демонстрирует различные примеры использования API."""
-    
-    print("🎯 Демонстрация API для обработки текста")
-    print("="*60)
-    
-    # Пример 1: Простой текст
-    print("\n🔹 ПРИМЕР 1: Простой текст")
-    simple_text = "Человек решает проблему. Он применяет новый подход. Получается хороший результат."
-    make_request(simple_text, banal_threshold=0.6, reproducibility_threshold=0.7)
-    
-    # Пример 2: Более сложный текст
-    print("\n\n🔹 ПРИМЕР 2: Сложный текст")
-    complex_text = """Когда человек сталкивается с проблемой, он часто пытается решить её привычными способами. 
-    Однако иногда требуется изменить подход к решению проблемы. 
-    Применение нового метода может привести к неожиданному и эффективному результату. 
-    Важно не бояться экспериментировать и пробовать различные варианты решения."""
-    make_request(complex_text, banal_threshold=0.5, reproducibility_threshold=0.6)
-    
-    # Пример 3: Текст с более строгими фильтрами
-    print("\n\n🔹 ПРИМЕР 3: Строгие фильтры")
-    make_request(simple_text, banal_threshold=0.8, reproducibility_threshold=0.9)
-    
-    print("\n" + "="*60)
-    print("✨ Демонстрация завершена!")
+        print(f"\n❌ Произошла ошибка: {e}")
 
 if __name__ == "__main__":
     main()

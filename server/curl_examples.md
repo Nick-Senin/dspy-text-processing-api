@@ -2,19 +2,19 @@
 
 ## 🌐 URL сервера
 ```
-https://081d-138-68-156-65.ngrok-free.app
+http://localhost:5000
 ```
 
 ## 📋 Проверка состояния сервера
 
 ### Windows PowerShell
 ```powershell
-Invoke-RestMethod -Uri "https://081d-138-68-156-65.ngrok-free.app/health"
+Invoke-RestMethod -Uri "http://localhost:5000/health"
 ```
 
 ### Linux/Mac/WSL
 ```bash
-curl https://081d-138-68-156-65.ngrok-free.app/health
+curl http://localhost:5000/health
 ```
 
 ## 📝 Обработка текста
@@ -27,12 +27,12 @@ $body = @{
     reproducibility_threshold = 0.7
 } | ConvertTo-Json
 
-Invoke-RestMethod -Uri "https://081d-138-68-156-65.ngrok-free.app/process" -Method POST -ContentType "application/json" -Body $body
+Invoke-RestMethod -Uri "http://localhost:5000/process" -Method POST -ContentType "application/json" -Body $body
 ```
 
 ### Linux/Mac/WSL
 ```bash
-curl -X POST https://081d-138-68-156-65.ngrok-free.app/process \
+curl -X POST http://localhost:5000/process \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Человек решает проблему. Он применяет новый подход. Получается хороший результат.",
@@ -53,7 +53,7 @@ curl -X POST https://081d-138-68-156-65.ngrok-free.app/process \
 
 Затем выполните:
 ```bash
-curl -X POST https://081d-138-68-156-65.ngrok-free.app/process \
+curl -X POST http://localhost:5000/process \
   -H "Content-Type: application/json" \
   -d @request.json
 ```
@@ -68,7 +68,7 @@ $body = @{
     reproducibility_threshold = 0.6
 } | ConvertTo-Json
 
-Invoke-RestMethod -Uri "https://081d-138-68-156-65.ngrok-free.app/process" -Method POST -ContentType "application/json" -Body $body
+Invoke-RestMethod -Uri "http://localhost:5000/process" -Method POST -ContentType "application/json" -Body $body
 ```
 
 ## 📊 Ожидаемый ответ
@@ -100,4 +100,4 @@ Invoke-RestMethod -Uri "https://081d-138-68-156-65.ngrok-free.app/process" -Meth
 
 1. **JSON parsing error** - убедитесь, что JSON корректно экранирован
 2. **Connection timeout** - увеличьте timeout до 30-60 секунд
-3. **ngrok URL изменился** - проверьте актуальный URL в консоли сервера
+3. **Сервер не запущен** - убедитесь, что Flask сервер запущен на порту 5000

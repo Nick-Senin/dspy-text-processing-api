@@ -1,1 +1,1 @@
-# Этот файл делает папку server Python пакетом
+# Flask server package for DSPy Text Processing API

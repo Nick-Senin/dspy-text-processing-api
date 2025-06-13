@@ -1,48 +1,34 @@
 #!/usr/bin/env python3
 """
 Скрипт для запуска Flask сервера из корневой папки проекта.
-Это удобно, чтобы не переходить в папку server.
 """
 
 import os
 import sys
+import subprocess
 
 def main():
-    """Запускает Flask сервер."""
-    
-    # Проверяем, что мы в корневой папке проекта
-    if not os.path.exists('server/app.py'):
-        print("❌ Ошибка: Не найден файл server/app.py")
-        print("Пожалуйста, запустите этот скрипт из корневой папки проекта.")
-        sys.exit(1)
+    # Получаем путь к корневой папке проекта
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    server_path = os.path.join(project_root, 'server', 'app.py')
     
     print("🚀 Запуск Flask сервера...")
-    print("📁 Путь к серверу: server/app.py")
-    print("🌐 Сервер будет доступен по адресу: http://localhost:5000")
-    print("⏹️  Для остановки нажмите Ctrl+C")
-    print("\n" + "="*60)
-    
-    # Добавляем папку server в путь Python
-    server_path = os.path.join(os.getcwd(), 'server')
-    if server_path not in sys.path:
-        sys.path.insert(0, server_path)
+    print(f"📁 Корневая папка проекта: {project_root}")
+    print(f"🌐 Сервер будет доступен по адресу: http://localhost:5000")
+    print("📖 Документация: server/README_FLASK.md")
+    print("🧪 Тестирование: cd server && python test_server.py")
+    print("-" * 50)
     
     try:
-        # Импортируем и запускаем приложение
-        from server.app import app
-        app.run(debug=True, host='0.0.0.0', port=5000)
-        
-    except ImportError as e:
-        print(f"❌ Ошибка импорта: {e}")
-        print("Проверьте, что все зависимости установлены: pip install -r requirements.txt")
-        sys.exit(1)
-        
+        # Запускаем сервер
+        subprocess.run([sys.executable, server_path], cwd=project_root)
     except KeyboardInterrupt:
-        print("\n\n🛑 Сервер остановлен пользователем.")
-        
+        print("\n⏹️  Сервер остановлен пользователем")
     except Exception as e:
-        print(f"\n❌ Неожиданная ошибка: {e}")
-        sys.exit(1)
+        print(f"\n❌ Ошибка при запуске сервера: {e}")
+        return 1
+    
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

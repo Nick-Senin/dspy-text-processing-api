@@ -19,7 +19,7 @@ from modules.process import process_text
 load_dotenv()
 
 # --- Constants ---
-OPTIMIZED_EXTRACTOR_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "optimized_extractor.pkl")
+OPTIMIZED_EXTRACTOR_PATH = "optimized_extractor.pkl"
 
 app = Flask(__name__)
 

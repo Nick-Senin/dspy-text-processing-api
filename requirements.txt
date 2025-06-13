@@ -3,4 +3,4 @@ openai
 python-dotenv
 flask
 requests
-pyngrok
+gunicorn

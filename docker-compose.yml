@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DSPy Text Processing API
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dspy-text-api
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      # Монтируем директорию для логов
+      - ./logs:/app/logs
+      # Монтируем директорию для временных файлов
+      - ./tmp:/app/tmp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - dspy-network
+
+  # ============================================================================
+  # Development версия (для разработки)
+  # ============================================================================
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dspy-text-api-dev
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONPATH=/app
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      # Монтируем исходный код для hot reload
+      - .:/app
+      - ./logs:/app/logs
+      - ./tmp:/app/tmp
+    restart: unless-stopped
+    command: ["python", "server/app.py"]
+    networks:
+      - dspy-network
+    profiles:
+      - dev
+
+networks:
+  dspy-network:
+    driver: bridge
+
+volumes:
+  logs:
+  tmp:

@@ -1,0 +1,6 @@
+dspy-ai
+openai
+python-dotenv
+flask
+requests
+pyngrok
